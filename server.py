@@ -1,83 +1,176 @@
-import os
-from passthrough import Passthrough
-# the server does not know either the user name or the file name. It only knows of userid (which is not same as username) and fileid. The mapping between the userId and the fileId with username and filename is maintained by the client software.
-list_paths = []
+import rpyc
+import sys
+import pymongo
+import pprint
+import random, math
+import string
+import Crypto
+from Crypto.PublicKey import RSA
 
-print("hello world")
+authenticated_users = ["user1"]
+#login = None
 
-def create_user(user_or_group, userid):
-	pwd = "/root"
-	os.mkdir(pwd+str(userid))
-	del list_paths[:]
-	list_paths = [pwd+str(userid)]
-	v = 32
-	if user_or_group != "user":
-		v = 16
-
-	while(len(list_paths)>0 and len(list_paths)<=pow(v,5)):
-		create_dirs(list_paths.pop(0))
-	del list_paths[:]
-
-def create_dirs(user_or_group,parent):
-	pwd = parent
-	size = 128
-	f = open(pwd+"/"+"file", "wb")
-	v = 32
-	if user_or_group != "user":
-		v = 16
-		c = open(pwd+"/"+"config","w")
-		c.write("0")
-		c.close()
-	# c will contain info whether this folder is empty or not. If not the user this folder belongs. Not required in case of users. ONly in case of groups.
-	f.seek(size-1)
-	f.write(b"\0")
-	f.close()
-	for k in range(v):
-		os.mkdir(parent+"/"+str(k))
-		list_paths.append(parent+"/"+str(k))
-
-
-def create_file(userid,filesequence, timestamp, files):
-	# files is a list of byte[] of any arbitrary size.
-	# timestamp will decide where to begin
-	# filesequence size is unknown. It is created by the client using some method a specific no. of times for a specific no. of bytes. Those values are then converted into their corresponding decimal equivalent. Based on these decimal equivalent, we can know the exact location of that folder in the user tree
-	# filesequence is a list format
-
-	# from the value in filesequence, you need to create the location of the folder
-	parent = "/root/"+str(userid)
-	for a in range(len(filesequence)):
-		#lets suppose that filesequence contains the path values 
+class UserService(rpyc.Service):
+	def on_connect(self, connection):
+		pass
+	
+	def on_disconnect(self, connection):
+		pass
+		
+	def exposed_register_user(self, username, password):
+		client = pymongo.MongoClient("mongodb://HarshVardhanKumar:HarshVardhanKumar1@ds241298.mlab.com:41298/securityproject")
+		db = client["securityproject"]
+		login = db["login_data"]
+		'''login_dat = login.find()
+		p = None
 		try:
-			f = open(filesequence[a]+"/file", "wb")
-			f.write(files[a])
-			f.close()
+			p = random.SystemRandom().randint(1025,pow(2,32)-1)
+			for data in login_dat:
+				if data["userid"] == str(p):
+					p = random.SystemRandom().randint(1025, pow(2,32)-1)
+					continue
 		except:
-			return 0
-	return 1
-
-def read_files_user(userid, filesequence, timestamp):
-	# no need to view if the files are in the corresponding directories or not. If wrong sequence, then you will get wrong data.
-	fi= ""
-	# assume that filesequence contains the path values
-	for a in range(len(filesequence)):
+			print("error")
+		'''
 		try:
-			f = open(filesequence[a]+"/file", "rb")
-			fi = fi + f.read()
-			f.close()
-		except: 
-			return 0
-	return fi
+			p = random.SystemRandom().randint(1025, pow(2,32)-1)
+			post = {"userid":str(p), "password": password}
+			print(post)
+			idi = login.insert_one(post)
+		except :
+			#return "not possible. Try again..."
+			print("exception occured")
+			return "error"
+		del login
+		del client
+		del db
+		return p
 
+#	def on_connect(self,connection):
+		# check if the user is authenticated by Login Servic
+#		print("User Service Connected")
 
+#	def on_disconnect(self,connection):
+#		pass
 
+	def find_paths(value,userid):
+		n = input("enter n: \n")
+		level = 50
+		path = ""
+		while level>1 :
+			level = int(math.floor(math.log(((n-1)*(value+1)+1), n)))
+			position = (((value - ((pow(n,level)-1)/(n-1)-1)) % n))
+			if position == 0:
+				position = n
+			path = str(position)+"/"+path
+			value = int(math.floor((value-1)/n))
+		
+		path = "/root/"+str(userid)+"/"+path
+		return path
 
+	def exposed_file_upload_user(self, userid, filee, file_sequence):
+		# see if the user is already authenticated
+		if not userid in authenticated_users:
+			return "authentication failed"
+		size = len(file_sequence)
+		for a in range(size):
+			path = find_paths(file_sequence[a], userid)
+			try:
+				with open(path+"/file", "wb") as fil:
+					fil.write(filee[a:a+127])
+			except:
+				return "error"
+		return "okay"
+	
+	def exposed_file_read_user(self, userid, file_sequence):
+		if not userid in authenticated_users:
+			return "authentication_failed"
+		size = len(file_sequence)
+		filee = ""
+		for a in range(size):
+			path = find_paths(file_sequence[a],userid)
+			try:
+				with open(path+"/file", "rb") as fil:
+					filee = filee+fil.read()[:-1]
+			except:
+				return "error"
+		filee = filee+"/0"
+		return filee
 
+	def exposed_file_delete_user(self, userid, file_sequence):
+		if not userid in authenticated_users:
+			return "authentication_failed"
+		size = len(file_sequence)
+		for a in range(size):
+			path = find_paths(file_sequence[a], userid)
+			try:
+				key = RSA.generate(2048)
+				binPrivKey = key.exportKey('DER')
+				binPubKey = key.publickey().exportKey('DER')
+				privKeyObj = RSA.importKey(binPrivKey)
+				pubKeyObj = RSA.importKey(binPubKey)
 
+				with open(path+"/file", "wb") as filee:
+					filee.write(privKeyObj.encrypt(''.join(choice() for i in range(127))))
+			except:
+				return 'error'
+		return "file deleted"
 
+#class LoginService(rpyc.Service):
+#	def on_connect(self, connection):
+#		print("connection established")
 
+#	def on_disconnect(self, connection):
+#		pass
+	
+	def exposed_authenticat(self,userid, password):
+		client = pymongo.MongoClient("mongodb://HarshVardhanKumar:HarshVardhanKumar1@ds241298.mlab.com:41298/securityproject")
+		db = client["securityproject"]
+		login = db["login_data"]
+		print(db.list_collection_names())
+		#p = random.SystemRandom().randint(1025,pow(2,16)-1)
+		try:
+			if login.count_documents({"userid":userid, "password":password})==1:
+				print("document found")
+				global authenticated_users
+				authenticated_users.append(userid)
+				del login
+				del db
+				del client
+		except:	
+			del login
+			del client
+			print("exception occured")
+			return "error"
+		return "authenticated"
+	
+	def exposed_logout(self, userid, password):
+		client = pymongo.MongoClient("mongodb://HarshVardhanKumar:HarshVardhanKumar1@ds241298.mlab.com:41298/securityproject")
+		db = client["securityproject"]
+		login = db["login_data"]
+		#print(db.list_collection_names())
+		#p = random.SystemRandom().randint(1025,pow(2,16)-1)
+		try:
+			if login.count_documents({"userid":userid, "password":password})==1:
+				print("document found")
+				global authenticated_users
+				authenticated_users.remove(userid)
+				del login
+				del db
+				del client
+		except:	
+			del login
+			del client
+			print("exception occured")
+			return "error"
+		return "logout"
 
-
-
-
-
-
+if __name__ == "__main__":
+	#authenticated_users
+	from rpyc.utils.server import ThreadedServer
+	#t = ThreadedServer(MyService, port = 1800)
+	t = ThreadedServer(UserService,port = 1544)
+	#l = ThreadedServer(LoginService, port = 1700)
+	t.start()
+	#l.start()
+	#t.start()
