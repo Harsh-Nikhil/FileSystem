@@ -30,6 +30,16 @@ if countvalue==0:
     post={"_id": email_id, "password":password}
     pointer.insert_one(post)
     print("Succesfully created the user.")
+    binPrivKey = key.exportKey('DER')
+    binPubKey = key.publickey().exportKey('DER')
+    privKeyObj=RSA.importKey(binPrivKey)
+    pubKeyObj=RSA.importKey(binPubKey)
+    #saving the user public key and private key
+    with open (username+"_publickey.txt","wb")as fd:
+    fd.write(binPubKey)
+    with open (username+"_privatekey.txt","wb") as fd:
+    fd.write(binPrivKey)
+       
 else:
     #password checking 
     cursor = pointer.find({"_id": email_id})
