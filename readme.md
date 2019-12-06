@@ -7,7 +7,7 @@ The code base for WrapCloud.
 
 In case for running on local machine, replace host by 'localhost'
 
-The default port for SingleUserService is port = 15892. The default port for GroupService is port = 
+The default port for SingleUserService is port = 15892. The default port for GroupService is port = 50001
 
 If you are a server admin, configure the 'host' accordingly.
 
