@@ -98,3 +98,74 @@ def delete_file():
         r = c.root.file_delete_user(userid, fileseqs)
     #TODO: implement the nodelist part for client. For GroupService, it is already impemented
     return r
+
+def g_authenticat(userid, password):
+    import rpyc
+    c = rpyc.connect('localhost',50001)
+    r = c.root.authenticat(userid, hashlib.sha256(password).digest())
+    return r
+
+def g_logout(userid, password):
+    import rpyc
+    c = rpyc.connect('localhost',50001)
+    r = c.root.logout(userid, hashlib.sha256(password).digest())
+    return r
+
+def g_file_admin_request(ownerid, password, key):
+    import rpyc
+    c = rpyc.connect('localhost',50001)
+    r = c.root.file_admin_request(userid, hashlib.sha256(password).digest(),key)
+    return r
+
+def g_admin_add_user(ownerid, password,userid, filename):
+    import rpyc
+    c = rpyc.connect('localhost',50001)
+    r = c.root.admin_add_user(userid, hashlib.sha256(password).digest(), userid, filename)
+    c.close()
+    return r
+
+def g_file_access(self, userid, password, filename, client_key):
+    import rpyc
+    c = rpyc.connect('localhost',50001)
+    r = c.root.file_access(userid, hashlib.sha256(password).digest(), filename, client_key)
+    return r
+
+def g_remove_user(self,admin_id,password,userid):
+    import rpyc
+    c = rpyc.connect('localhost', 50001)
+    r = c.root.file_access(self, userid, hashlib.sha256(password).digest(), filename, client_key)
+    return r
+def g_file_upload(self, admin_id,file, password,filename,0):
+    import rpyc
+    c = rpyc.connect('localhost', 50001)
+    r = c.root.file_upoad(admin_id,file,hashlib.sha256(password).digest(),filename, 0)
+    return r
+
+username = ""
+password = ""
+
+type = raw_input("Which operations you want to perform? \n1. Register \n2.upload_file\n3.Login\n4.Logout\n5.Delete_file\n6.GroupOperations: ")
+if type == 1:
+    register()
+else if type ==2:
+    upload_file()
+else if type == 3:
+    username = input("Enter username: ")
+    password = hashlib.sha256(input("Enter password: ")).digest()
+    authenticat(username, password)
+else if type == 4:
+    logout(username, password)
+else if type == 5:
+    delete_file()
+else if type == 6:
+    # perform group operations.
+    v = raw_input("Enter the operation:\n1.Authenticate\n2.Logout\n3.OwnerPrivilege\n4.Share with other user\n5.Read File\n6.Revoke Access from another user\n7.Upload file\n8.Delete file\n")
+    if v==1:
+        g_authenticat(input("Enter username:"),input("Enter password:"))
+    else if v==2:
+        g_logout(input("Enter username:"),input("Enter password:"))
+    else if v==3:
+        g_file_admin_request(input("Enter username:"),input("Enter password:"))
+    else:
+        a = 5
+        #TODO: IMplement these methods.
