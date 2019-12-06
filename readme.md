@@ -1,7 +1,19 @@
 This implementation will run in the python version (2.7).
 
-Before running the server, make sure that you have installed the required dependencies which you have included in the program.
+The code base for WrapCloud.
 
-First run the server.py program through the command python server.py and after that run the client.py program
+# Usage:
+<code>python 'f system.py' root_folder mnt_folder host </code>
 
-When you want to upload a file from the local machine, please specify the full path of the file to be uploaded.
+In case for running on local machine, replace host by 'localhost'
+
+The default port for SingleUserService is port = 15892. The default port for GroupService is port = 
+
+If you are a server admin, configure the 'host' accordingly.
+
+# Dependencies:
+* hashlib
+* pymongo
+* chacha20poly1305
+* pycryptodome (Crypto)
+* pyDH
