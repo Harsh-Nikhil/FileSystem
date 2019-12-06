@@ -1,22 +1,5 @@
-All Server Functions in Server.py : 12-13th Nov : Harsh Kumar
+This implementation will run in the python version (2.7).
+Before running the server, make sure that you have installed the required dependencies which you have included in the program.
 
-All Functions in Fs.py : 12-13th Nov: Harsh Kumar
-
-RPyC : Client and Server communication : 12th Nov: Nikhil Agrawal
-
-All Client Functions in client.py : 13th NOv : Nikhil Agrawal
-
-Group Management:
-
-User Addition: 14th Nov : combined
-
-File Upload: 14th Nov: combined
-
-File Deletion: 14th Nov: combined
-
-Acess Control: 15th Nov: combined
-   
-
-User Removal: 16th Nov: combined
-   
-Slides Preparation: 17th Nov: combined
+First run the server.py program through the command python server.py and after that run the client.py program
+When you want to upload a file from the local machine, please specify the full path of the file to be uploaded.
