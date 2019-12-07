@@ -250,7 +250,7 @@ class GroupService(rpyc.Service):
 		c = 0
 		f = open(self.occupied,'r')
 		nonce = self.pipe.recv()
-		self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+		self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 		r = csv.reader(f,delimiter = ",")
 		d = list(r)
 		f.close()
@@ -305,22 +305,22 @@ class GroupService(rpyc.Service):
 
 			with open(self.filename_admin,'w') as f:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				w = csv.writer(f)
 				w.writerow([filename,hashlib.sha256(admin_id).digest()])
 			with open(self.filename_listofusers,'w') as f:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				w = csv.writer(f)
 				w.writerow([filename, hashlib.sha256(admin_id).digest()])
 			with open(self.fileid_filename_secret_nonce_length,'w') as f:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				w = csv.writer(f)
 				w.writerow([fileid,filename,self.admin_keys[admin_id],self.nonce[admin_id]])
 			with open(self.occupied,'w') as f:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				w = csv.writer(f)
 				w.writerows(d)
 
@@ -328,7 +328,7 @@ class GroupService(rpyc.Service):
 
 			with open(self.filename_admin,'r') as f_r:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				r = csv.reader(f_r, delimiter=",")
 				d1 = list(r)
 				for row in d1:
@@ -338,13 +338,13 @@ class GroupService(rpyc.Service):
 
 			with open(self.filename_admin,'w') as f_w:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				w = csv.writer(f_w)
 				w.writerows(d1)
 
 			with open(self.filename_listofusers,'r') as f_r:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 
 				r = csv.reader(f_r, delimiter=",")
 
@@ -355,12 +355,12 @@ class GroupService(rpyc.Service):
 						break
 			with open(self.filename_listofusers,'w') as f_w:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				w = csv.writer(f_w)
 				w.writerows(d)
 			with open(self.fileid_filename_secret_nonce_length,'r') as f_r:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 
 				r = csv.reader(f_r, delimiter=",")
 				d = list(r)
@@ -370,7 +370,7 @@ class GroupService(rpyc.Service):
 						break
 			with open(self.fileid_filename_secret_nonce_length,'w') as f_w:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				w = csv.writer(f_w)
 				w.writerows(d)
 
@@ -385,20 +385,20 @@ def exposed_file_delete(self, admin_id,filename, password):
 
 		with open(self.filename_admin,'r') as f:
 			nonce = self.pipe.recv()
-			self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+			self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 			d1 = list(csv.reader(f,delimiter=","))
 
 		with open(self.fileid_filename_secret_nonce_length,'r') as f:
 			nonce = self.pipe.recv()
-			self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+			self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 			dd = list(csv.reader(f,delimiter=","))
 		with open(self.filename_listofusers,'r') as f:
 			nonce = self.pipe.recv()
-			self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+			self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 			d3 = list(csv.reader(f,delimiter=","))
 		with open(self.occupied,'r') as f:
 			nonce = self.pipe.recv()
-			self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+			self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 			d4 = list(csv.reader(f,delimiter=","))
 
 		for x in d1:
@@ -415,17 +415,17 @@ def exposed_file_delete(self, admin_id,filename, password):
 		try:
 			with open(self.filename_admin,'w') as f:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				w = csv.writer(f)
 				w.writerows(d1)
 			with open(self.fileid_filename_secret_nonce_length,'w') as f:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				ww = csv.writer(f)
 				ww.writerows(dd)
 			with open(self.filename_listofusers,'w') as f:
 				nonce = self.pipe.recv()
-				self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+				self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 				www = csv.writer(f)
 				www.writerows(d3)
 		except:
@@ -443,7 +443,7 @@ def exposed_file_delete(self, admin_id,filename, password):
 
 		with open(self.occupied,'w') as f:
 			nonce = self.pipe.recv()
-			self.pipe.send(self.cip.encrypt(nonce),bytearray(nonce))
+			self.pipe.send(self.cip.encrypt(nonce,bytearray(nonce)))
 			wwww = csv.writer(f)
 			try:
 				wwww.writerows(d4)
