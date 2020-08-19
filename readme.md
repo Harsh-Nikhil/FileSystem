@@ -5,7 +5,7 @@ This is the implementation of a new proposal to store classified information on 
 
 Please see [here](/Readme_implementation_details.pdf) for the **complete proposal**.
  
-This implementation will run in python version(2.7).
+This implementation run on python(2.7).
 
 # Usage:
 <code>python 'f system.py' root_folder mnt_folder host </code>  
