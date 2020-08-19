@@ -3,7 +3,7 @@
 
 This is the implementation of a new proposal to store classified information on untrusted servers. The proposal ensures security of information even in case the attacker has physical access to the storage hardware. The proposed system reduces the probabilty of a successful attack to less than 2^{-20000}.  
 
-Please see [here](/Readme_implementation_details.pdf) for the **complete proposal**.
+Please look [here](/Readme_implementation_details.pdf) for the **complete proposal**.
  
 This implementation run on python(2.7).
 
